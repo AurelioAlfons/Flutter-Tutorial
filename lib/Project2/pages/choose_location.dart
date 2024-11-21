@@ -11,7 +11,11 @@ class _LocationState extends State<Location> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Text('Choose Location'),
+      body: Center(
+          child: Text(
+        'Choose Location',
+        style: TextStyle(fontSize: 40),
+      )),
     );
   }
 }

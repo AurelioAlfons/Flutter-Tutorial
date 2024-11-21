@@ -2,6 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter1/Project1/ninjacard.dart';
+import 'package:flutter1/Project2/pages/choose_location.dart';
+import 'package:flutter1/Project2/pages/home.dart';
+import 'package:flutter1/Project2/pages/loading.dart';
+import 'package:flutter1/Project2/wordltime.dart';
 import 'package:flutter1/UI/home.dart';
 import 'package:flutter1/UI/starter.dart';
 import 'package:flutter1/lessons/expanded.dart';
@@ -17,9 +21,17 @@ class ScaffoldExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        // home: NavigationBro(),
-        home: QuoteList());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      // home: NavigationBro(),
+      // home: const WorldTime(),
+      // Routes
+      initialRoute: '/home',
+      routes: {
+        '/': (context) => const Loading(),
+        '/home': (context) => const Home(),
+        '/location': (context) => const Location(),
+      },
+    );
   }
 }

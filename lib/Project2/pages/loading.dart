@@ -10,6 +10,12 @@ class Loading extends StatefulWidget {
 class _LoadingState extends State<Loading> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold(
+      body: Center(
+          child: Text(
+        'Loading Screen',
+        style: TextStyle(fontSize: 40),
+      )),
+    );
   }
 }
