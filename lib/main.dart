@@ -1,7 +1,7 @@
 // ignore_for_file: unused_import
 
 import 'package:flutter/material.dart';
-import 'package:flutter1/Project/ninjacard.dart';
+import 'package:flutter1/Project1/ninjacard.dart';
 import 'package:flutter1/UI/home.dart';
 import 'package:flutter1/UI/starter.dart';
 import 'package:flutter1/lessons/expanded.dart';
