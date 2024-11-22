@@ -10,13 +10,23 @@ class Location extends StatefulWidget {
 class _LocationState extends State<Location> {
   int counter = 0;
 
-  void getData() {
+  // Asynchronous function
+  void getData() async {
     // Simulate a network request for username
-    // Wait for 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
+    // Wait for 3 seconds (delay)
+    String username = await Future.delayed(const Duration(seconds: 3), () {
       // ignore: avoid_print
-      print('Yoshi');
+      return 'yoshi';
     });
+
+    String bio = await Future.delayed(const Duration(seconds: 2), () {
+      // ignore: avoid_print
+      return 'Vegan 2024';
+    });
+
+    // This will run first and won't interupt
+    // ignore: avoid_print
+    print('$username - $bio');
   }
 
   @override
@@ -25,8 +35,7 @@ class _LocationState extends State<Location> {
   // init runs first
   void initState() {
     super.initState();
-    // ignore: avoid_print
-    print('inintState function ran');
+    getData();
   }
 
   @override
