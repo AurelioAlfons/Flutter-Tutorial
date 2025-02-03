@@ -12,7 +12,6 @@ class Payroll extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const EmployeeList(),
-        // '/add-employee': (context) => const AddEmployee(),
       },
     );
   }

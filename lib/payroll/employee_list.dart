@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter1/payroll/widget/add_employee_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class EmployeeList extends StatefulWidget {
   const EmployeeList({super.key});
@@ -10,6 +12,30 @@ class EmployeeList extends StatefulWidget {
 
 class _EmployeeListState extends State<EmployeeList> {
   final List<Map<String, String>> _employees = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadEmployees();
+  }
+
+  Future<void> saveEmployees() async {
+    final prefs = await SharedPreferences.getInstance();
+    final employeesJson = jsonEncode(_employees);
+    await prefs.setString('employees', employeesJson);
+  }
+
+  Future<void> loadEmployees() async {
+    final prefs = await SharedPreferences.getInstance();
+    final employeesJson = prefs.getString('employees');
+    if (employeesJson != null) {
+      setState(() {
+        _employees.clear();
+        _employees
+            .addAll(List<Map<String, String>>.from(jsonDecode(employeesJson)));
+      });
+    }
+  }
 
   void _showAddEmployeeDialog({Map<String, String>? employee, int? index}) {
     showDialog(
@@ -35,6 +61,7 @@ class _EmployeeListState extends State<EmployeeList> {
                 'salary': salary,
               });
             }
+            saveEmployees();
           });
         },
       ),
@@ -87,12 +114,10 @@ class _EmployeeListState extends State<EmployeeList> {
                       ),
                       // Salary as a button
                       ElevatedButton(
-                        onPressed: () {
-                          // Optional action for the salary button
-                        },
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              const Color.fromARGB(255, 255, 231, 14),
+                              const Color.fromARGB(255, 241, 227, 17),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -110,7 +135,6 @@ class _EmployeeListState extends State<EmployeeList> {
                     ],
                   ),
                   onTap: () {
-                    // Open the dialog to edit employee details
                     _showAddEmployeeDialog(employee: employee, index: index);
                   },
                 );
