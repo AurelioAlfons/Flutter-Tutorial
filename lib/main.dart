@@ -13,25 +13,28 @@ import 'package:flutter1/lessons/list.dart';
 import 'package:flutter1/lessons/navbar.dart';
 import 'package:flutter1/lessons/navbar2ex.dart';
 import 'package:flutter1/lessons/scaffold_example.dart';
+import 'package:flutter1/payroll/payroll.dart';
 
-void main() => runApp(const ScaffoldExampleApp());
+void main() => runApp(const Payroll());
 
-class ScaffoldExampleApp extends StatelessWidget {
-  const ScaffoldExampleApp({super.key});
+// void main() => runApp(const ScaffoldExampleApp());
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // home: NavigationBro(),
-      // home: const WorldTime(),
-      // Routes
-      initialRoute: '/home',
-      routes: {
-        '/': (context) => const Loading(),
-        '/home': (context) => const Home(),
-        '/location': (context) => const Location(),
-      },
-    );
-  }
-}
+// class ScaffoldExampleApp extends StatelessWidget {
+//   const ScaffoldExampleApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       // home: NavigationBro(),
+//       // home: const WorldTime(),
+//       // Routes
+//       initialRoute: '/',
+//       routes: {
+//         '/': (context) => const Loading(),
+//         '/home': (context) => const Home(),
+//         '/location': (context) => const Location(),
+//       },
+//     );
+//   }
+// }
