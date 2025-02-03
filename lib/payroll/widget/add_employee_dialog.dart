@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
 
 class AddEmployeeDialog extends StatefulWidget {
-  final Function(String name, String position, String salary) onAddEmployee;
+  final String? initialName;
+  final String? initialPosition;
+  final String? initialSalary;
+  final Function(String name, String position, String salary) onSave;
 
-  const AddEmployeeDialog({super.key, required this.onAddEmployee});
+  const AddEmployeeDialog({
+    super.key,
+    this.initialName,
+    this.initialPosition,
+    this.initialSalary,
+    required this.onSave,
+  });
 
   @override
   State<AddEmployeeDialog> createState() => _AddEmployeeDialogState();
 }
 
 class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _positionController = TextEditingController();
-  final TextEditingController _salaryController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _positionController;
+  late TextEditingController _salaryController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.initialName ?? '');
+    _positionController =
+        TextEditingController(text: widget.initialPosition ?? '');
+    _salaryController = TextEditingController(text: widget.initialSalary ?? '');
+  }
 
   @override
   void dispose() {
@@ -22,16 +40,16 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
     super.dispose();
   }
 
-  void _addEmployee() {
+  void _save() {
     final name = _nameController.text.trim();
     final position = _positionController.text.trim();
     final salary = _salaryController.text.trim();
 
     if (name.isNotEmpty && position.isNotEmpty && salary.isNotEmpty) {
-      widget.onAddEmployee(name, position, salary);
-      Navigator.pop(context); // Close the dialog after adding
+      widget.onSave(name, position, salary);
+      Navigator.pop(context); // Close the dialog
     } else {
-      // Optionally show an error message
+      // Show an error if fields are empty
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('All fields are required')),
       );
@@ -48,16 +66,15 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
         padding: const EdgeInsets.all(16),
         constraints: const BoxConstraints(maxWidth: 400),
         child: Column(
-          mainAxisSize:
-              MainAxisSize.min, // Ensures dialog size adjusts to content
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Title
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Add Employee',
-                  style: TextStyle(
+                Text(
+                  widget.initialName == null ? 'Add Employee' : 'Edit Employee',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -99,18 +116,17 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
             ),
             const SizedBox(height: 24),
 
-            // ADD button at the bottom
+            // Save button
             ElevatedButton(
-              onPressed: _addEmployee,
+              onPressed: _save,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                minimumSize:
-                    const Size(double.infinity, 0), // Full-width button
+                minimumSize: const Size(double.infinity, 0),
               ),
-              child: const Text('ADD'),
+              child: const Text('SAVE'),
             ),
           ],
         ),

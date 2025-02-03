@@ -11,17 +11,30 @@ class EmployeeList extends StatefulWidget {
 class _EmployeeListState extends State<EmployeeList> {
   final List<Map<String, String>> _employees = [];
 
-  void _showAddEmployeeDialog() {
+  void _showAddEmployeeDialog({Map<String, String>? employee, int? index}) {
     showDialog(
       context: context,
       builder: (context) => AddEmployeeDialog(
-        onAddEmployee: (String name, String position, String salary) {
+        initialName: employee?['name'],
+        initialPosition: employee?['position'],
+        initialSalary: employee?['salary'],
+        onSave: (String name, String position, String salary) {
           setState(() {
-            _employees.add({
-              'name': name,
-              'position': position,
-              'salary': salary,
-            });
+            if (index != null) {
+              // Update existing employee
+              _employees[index] = {
+                'name': name,
+                'position': position,
+                'salary': salary,
+              };
+            } else {
+              // Add new employee
+              _employees.add({
+                'name': name,
+                'position': position,
+                'salary': salary,
+              });
+            }
           });
         },
       ),
@@ -75,11 +88,11 @@ class _EmployeeListState extends State<EmployeeList> {
                       // Salary as a button
                       ElevatedButton(
                         onPressed: () {
-                          // Handle salary button action (e.g., show salary details)
+                          // Optional action for the salary button
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(
-                              255, 92, 220, 224), // Button color
+                          backgroundColor:
+                              const Color.fromARGB(255, 255, 231, 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -96,13 +109,16 @@ class _EmployeeListState extends State<EmployeeList> {
                       ),
                     ],
                   ),
+                  onTap: () {
+                    // Open the dialog to edit employee details
+                    _showAddEmployeeDialog(employee: employee, index: index);
+                  },
                 );
               },
-              separatorBuilder: (context, index) =>
-                  const Divider(), // Divider between employees
+              separatorBuilder: (context, index) => const Divider(),
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddEmployeeDialog,
+        onPressed: () => _showAddEmployeeDialog(),
         child: const Icon(Icons.add),
       ),
     );
