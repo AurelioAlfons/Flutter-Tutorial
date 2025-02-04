@@ -28,7 +28,9 @@ class _MainScreenState extends State<MainScreen> {
   // Define the pages for each bottom navigation bar item
   static const List<Widget> _pages = <Widget>[
     EmployeeList(), // Employee List Screen
-    RosterScreen(), // Roster Scheduling Screen
+    RosterScreen(
+      employees: [],
+    ), // Roster Scheduling Screen
   ];
 
   void _onItemTapped(int index) {

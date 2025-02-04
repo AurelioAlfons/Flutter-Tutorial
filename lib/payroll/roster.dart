@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
 
 class RosterScreen extends StatefulWidget {
-  const RosterScreen({super.key});
+  final List<Map<String, String>> employees; // Employee list from EmployeeList
+
+  const RosterScreen({super.key, required this.employees});
 
   @override
   State<RosterScreen> createState() => _RosterScreenState();
@@ -11,12 +15,36 @@ class RosterScreen extends StatefulWidget {
 class _RosterScreenState extends State<RosterScreen> {
   DateTime _currentWeekStart = _getMondayOfCurrentWeek();
   final Map<String, List<String>> _schedule = {}; // Employee schedules
+  late List<Map<String, String>> _employees; // Local employee list
+
+  @override
+  void initState() {
+    super.initState();
+    _employees = List.from(widget.employees); // Initialize local employees list
+    _loadEmployees(); // Load additional employees from SharedPreferences
+  }
+
+  // Load Employees from SharedPreferences
+  Future<void> _loadEmployees() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? employeesJson = prefs.getString('employees');
+
+    if (employeesJson != null) {
+      setState(() {
+        _employees = (jsonDecode(employeesJson) as List<dynamic>)
+            .map((item) => (item as Map<String, dynamic>).map(
+                  (key, value) => MapEntry(key, value as String),
+                ))
+            .toList();
+      });
+    }
+  }
 
   // Get Monday of the current week
   static DateTime _getMondayOfCurrentWeek() {
     final now = DateTime.now();
-    return now.subtract(
-        Duration(days: now.weekday - 1)); // Ensure Monday is the first day
+    return now
+        .subtract(Duration(days: now.weekday - 1)); // Start week on Monday
   }
 
   // Get the week range
@@ -41,18 +69,32 @@ class _RosterScreenState extends State<RosterScreen> {
     });
   }
 
-  // Add an employee or shift
+  // Add a shift for selected employee
   void _addShift(String day) {
+    String? selectedEmployee;
+
     showDialog(
       context: context,
       builder: (context) {
-        final TextEditingController nameController = TextEditingController();
-
         return AlertDialog(
           title: const Text('Add Employee Shift'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: 'Enter employee name'),
+          content: DropdownButtonFormField<String>(
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Select Employee',
+            ),
+            value: selectedEmployee,
+            items: _employees
+                .map((employee) => DropdownMenuItem<String>(
+                      value: employee['name'], // Use employee name as value
+                      child: Text(employee['name']!),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedEmployee = value!;
+              });
+            },
           ),
           actions: [
             TextButton(
@@ -61,11 +103,17 @@ class _RosterScreenState extends State<RosterScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  _schedule[day] = _schedule[day] ?? [];
-                  _schedule[day]!.add(nameController.text);
-                });
-                Navigator.pop(context);
+                if (selectedEmployee != null) {
+                  setState(() {
+                    _schedule[day] = _schedule[day] ?? [];
+                    _schedule[day]!.add(selectedEmployee!);
+                  });
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select an employee.')),
+                  );
+                }
               },
               child: const Text('Add'),
             ),
@@ -81,11 +129,11 @@ class _RosterScreenState extends State<RosterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Roster Scheduling'),
+        title: Text('Roster Scheduling (${_getWeekRange()})'),
       ),
       body: Column(
         children: [
-          // Week navigation with background color
+          // Week navigation
           Container(
             color: const Color.fromARGB(255, 70, 50, 252),
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -113,7 +161,7 @@ class _RosterScreenState extends State<RosterScreen> {
           ),
           const Divider(height: 1),
 
-          // Daily schedule with dividers and styled left section
+          // Daily schedule
           Expanded(
             child: ListView.builder(
               itemCount: weekDays.length,
@@ -132,7 +180,7 @@ class _RosterScreenState extends State<RosterScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Left: Day and date in a colored box
+                          // Day and date
                           Container(
                             width: 70,
                             padding: const EdgeInsets.all(8),
@@ -147,38 +195,37 @@ class _RosterScreenState extends State<RosterScreen> {
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Colors.white,
                                   ),
                                 ),
                                 Text(
                                   shortDay,
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          // Vertical divider between date and shifts
+                          // Vertical divider
                           Container(
                             height: 50,
                             width: 1,
                             color: Colors.grey,
                             margin: const EdgeInsets.symmetric(horizontal: 8),
                           ),
-                          // Right: Employee shifts
+                          // Employee shifts
                           Expanded(
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: [
-                                  // Employee buttons
                                   ...employees.map(
                                     (employee) => Container(
                                       margin: const EdgeInsets.symmetric(
                                           horizontal: 8),
-                                      width: 120, // Same size as the add button
+                                      width: 120,
                                       height: 50,
                                       child: ElevatedButton(
                                         onPressed: () {
@@ -188,8 +235,8 @@ class _RosterScreenState extends State<RosterScreen> {
                                           backgroundColor: const Color.fromARGB(
                                               255, 68, 255, 199),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                4), // Square or rectangle
+                                            borderRadius:
+                                                BorderRadius.circular(4),
                                           ),
                                         ),
                                         child: Text(
@@ -200,21 +247,20 @@ class _RosterScreenState extends State<RosterScreen> {
                                       ),
                                     ),
                                   ),
-                                  // Add button
+                                  // Add shift button
                                   Container(
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 8),
-                                    width: 120, // Same size as employee buttons
+                                    width: 120,
                                     height: 50,
                                     child: ElevatedButton(
                                       onPressed: () => _addShift(formattedDay),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors
-                                            .transparent, // Transparent background
+                                        backgroundColor: Colors.transparent,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              4), // Square or rectangle
+                                          borderRadius:
+                                              BorderRadius.circular(4),
                                           side: const BorderSide(
                                               color: Colors.grey),
                                         ),
