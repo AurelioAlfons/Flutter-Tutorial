@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  intl: ^0.17.0
+  
   google_nav_bar: ^5.0.7
   http: ^1.2.2
 

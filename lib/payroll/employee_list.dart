@@ -51,7 +51,7 @@ class _EmployeeListState extends State<EmployeeList> {
           ? const Center(
               child: Text(
                 'No employees added yet.',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 18),
               ),
             )
           : ListView.separated(
